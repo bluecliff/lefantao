@@ -1,6 +1,6 @@
 #encoding: utf-8
 
-from flask import Flask,request,g,render_template
+from flask import Flask,request,g,render_template,make_response
 from flask.views import MethodView
 import MySQLdb
 import xml.etree.ElementTree as ET
@@ -113,7 +113,7 @@ class Lefantao(MethodView):
     def get(self):
         """处理合法请求认证"""
         string = request.args.get('echostr', '')
-        return string
+        return make_response(string)
     def post(self):
         """处理消息相应"""
         data = request.stream.read()
