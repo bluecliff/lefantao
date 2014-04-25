@@ -200,11 +200,11 @@ def pullItem():
     return "OK"
 
 lft_view=Lefantao.as_view('lft')
-app.add_url_rule('/lft',view_func=lft_view,methods=['GET','POST'])
+app.add_url_rule('/wx/',view_func=lft_view,methods=['GET','POST'])
 application = WSGIApplication(app)
 
 if __name__ == '__main__':
     lft_view=Lefantao.as_view('lft')
-    app.add_url_rule('/lft',view_func=lft_view,methods=['GET','POST'])
+    app.add_url_rule('/wx/',view_func=lft_view,methods=['GET','POST'])
     app.debug=True
     app.run()
