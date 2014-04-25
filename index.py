@@ -119,7 +119,7 @@ class Lefantao(MethodView):
         data = request.stream.read()
         dom=ET.fromstring(data)
         msgtype = dom.find('MsgType').text
-        self.msgHandler[msgtype]
+        return self.msgHandler[msgtype]
 
 
 def connect_db():
