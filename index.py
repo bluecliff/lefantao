@@ -85,7 +85,7 @@ class MessageHandler(object):
     @classmethod
     def textMessageHandler(cls,dom):
         """处理text事件"""
-        context={}
+        context=cls.get_context(dom)
         content = dom.find('Content').text
         if not content.isdigit():
             if content==u'是':
@@ -119,7 +119,7 @@ class Lefantao(MethodView):
         data = request.stream.read()
         dom=ET.fromstring(data)
         msgtype = dom.find('MsgType').text
-        return self.msgHandler[msgtype]
+        self.msgHandler[msgtype]
 
 
 def connect_db():
