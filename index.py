@@ -20,6 +20,6 @@ if __name__ == '__main__':
     logging.basicConfig(filename='lefantao.log',level=logging.INFO)
     sched=Scheduler()
     sched.start()
-    sched.add_cron_job(grab_items,second=20)
+    sched.add_cron_job(grab_items,minute=20)
     app.debug=True
     app.run()
