@@ -14,6 +14,9 @@ app = Flask(__name__)
 lft_view=Lefantao.as_view('lft')
 app.add_url_rule('/wx/',view_func=lft_view,methods=['GET','POST'])
 logging.basicConfig(filename='/home/bae/log/lefantao.log',level=logging.INFO)
+sched=Scheduler()
+sched.start()
+sched.add_cron_job(grab_items,minute=20)
 application = WSGIApplication(app)
 
 if __name__ == '__main__':
