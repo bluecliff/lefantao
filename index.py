@@ -5,7 +5,7 @@ from lefantao.lefantao import Lefantao
 from lefantao.grab import grab_items
 from apscheduler.scheduler import Scheduler
 import logging
-#from bae.core.wsgi import WSGIApplication
+from bae.core.wsgi import WSGIApplication
 
 app = Flask(__name__)
 
@@ -13,7 +13,8 @@ app = Flask(__name__)
 
 lft_view=Lefantao.as_view('lft')
 app.add_url_rule('/wx/',view_func=lft_view,methods=['GET','POST'])
-#application = WSGIApplication(app)
+logging.basicConfig(filename='/home/bae/log/lefantao.log',level=logging.INFO)
+application = WSGIApplication(app)
 
 if __name__ == '__main__':
     logging.basicConfig(filename='lefantao.log',level=logging.INFO)
