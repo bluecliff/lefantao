@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from flask import g,render_template
+from flask import render_template,make_response,request
+from flask.views import MethodView
+import xml.etree.ElementTree as ET
 import time
+from utils import get_items,add_user
 
 EventKeyNo={
         u'TODAY_ITEMS':0,
@@ -11,28 +14,6 @@ EventKeyNo={
         u'HOMELIVE':4,
         u'MORE':12,
         }
-
-def getItems(m):
-    cursor=g.db.cursor()
-    sql = ''
-    if m==0:
-        sql='select item_name, item_url, item_img, item_desc, item_time from items order by item_id desc limit 10'
-    else:
-        sql='select item_name, item_url, item_img, item_desc, item_time from items where item_cate_id = %s order by item_id desc limit 8' % m
-
-    n = cursor.execute(sql)
-    items=[]
-    for row in cursor.fetchall():
-        items.append({'item_name':row[0],'item_url':row[1],'item_img':row[2],'item_desc':row[3]})
-    cursor.close()
-    return items
-
-def addNewUser(username):
-    cursor=g.db.cursor()
-    sql="insert into subscriptions(cate_id,user_name) values(0,'%s')" %(username)
-    n = cursor.execute(sql)
-    cursor.close()
-    return str(n)
 
 
 def get_context(dom):
@@ -45,7 +26,7 @@ def get_context(dom):
 def subscribeHandler(dom):
     """处理订阅事件"""
     fromname = dom.find('FromUserName').text
-    addNewUser(fromname)
+    add_user(fromname)
     context=get_context(dom)
     context['content']=u"欢迎您订阅乐翻淘，我们将为您提供各种高性价比的购物推荐。现在您可以回复对应的编号查询最新的网购促销信息"
     return render_template('erro.html',**context)
@@ -55,7 +36,7 @@ def clickHandler(dom):
     cate = dom.find('EventKey').text
     context=get_context(dom)
     if 0<=EventKeyNo[cate]<=11:
-        context['items']=getItems(EventKeyNo[cate])
+        context['items']=get_items(EventKeyNo[cate])
         return render_template('show_items.html',**context)
     else:
         context["content"]=u"回复对应的编号可查询最新的相关网购促销信息:"
@@ -88,8 +69,24 @@ class MessageHandler(object):
                 context["content"]=u"回复对应的编号可查询最新的相关网购促销信息:"
                 return render_template('erro.html',**context)
         if 0<=int(content)<=11:
-            context['items']=getItems(int(content))
+            context['items']=get_items(int(content))
             return render_template('show_items.html',**context)
         else:
             context["content"]=u"回复对应的编号可查询最新的相关网购促销信息:"
             return render_template('erro.html',**context)
+
+class Lefantao(MethodView):
+    msgHandler={
+            u'event':MessageHandler.eventMessageHandler,
+            u'text':MessageHandler.textMessageHandler,
+            }
+    def get(self):
+        """处理合法请求认证"""
+        string = request.args.get('echostr', '')
+        return make_response(string)
+    def post(self):
+        """处理消息相应"""
+        data = request.stream.read()
+        dom=ET.fromstring(data)
+        msgtype = dom.find('MsgType').text
+        return self.msgHandler[msgtype](dom)
