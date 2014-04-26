@@ -74,5 +74,5 @@ def add_items(items):
         count+=n
     cursor.close()
     close_db(db)
-    return n
+    return count
 
